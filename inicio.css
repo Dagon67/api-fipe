@@ -1,0 +1,80 @@
+body, ul, li, p {
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    font-family: Arial, sans-serif;
+    font-size: 1.2rem;
+}
+
+a {
+    text-decoration: none;
+    color: red;
+}
+
+.header {
+    background: #1d1e20;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.menu {
+    display: flex;
+}
+
+.menu li {
+    margin-left: 20px;
+}
+
+.menu li a {
+    display: block;
+    padding: 10px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    justify-items: center;
+    align-items: center;
+    height: 80vh;
+    gap: 20px;
+    padding: 20px;
+}
+
+.bem, .log {
+    text-align: center;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+form input {
+    padding: 10px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.button {
+    padding: 15px;
+    font-size: 1.2rem;
+    color: white;
+    background-color: red;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: darkred;
+}

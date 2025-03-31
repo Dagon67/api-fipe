@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta FIPE</title>
+    <link rel="stylesheet" href="styles4.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Consulta FIPE</h1>
+        
+        <div class="form-group">
+            <label for="marca">Marca:</label>
+            <select id="marca" class="select-field">
+                <option value="">Selecione a marca</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="modelo">Modelo:</label>
+            <select id="modelo" class="select-field" disabled>
+                <option value="">Selecione o modelo</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="ano">Ano:</label>
+            <select id="ano" class="select-field" disabled>
+                <option value="">Selecione o ano</option>
+            </select>
+        </div>
+
+        <button id="consultar" class="btn-consultar">Consultar</button>
+
+        <div id="resultado" class="resultado"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const marcaSelect = document.getElementById("marca");
+            const modeloSelect = document.getElementById("modelo");
+            const anoSelect = document.getElementById("ano");
+            const consultarButton = document.getElementById("consultar");
+            const resultadoDiv = document.getElementById("resultado");
+
+            // Função para fazer uma solicitação à API FIPE
+            async function fetchFromAPI(url) {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Erro na API");
+                return response.json();
+            }
+
+            // Carregar marcas
+            async function loadMarcas() {
+                try {
+                    const marcas = await fetchFromAPI('https://parallelum.com.br/fipe/api/v1/carros/marcas');
+                    marcas.forEach(marca => {
+                        const option = document.createElement("option");
+                        option.value = marca.codigo;
+                        option.textContent = marca.nome;
+                        marcaSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Carregar modelos
+            marcaSelect.addEventListener("change", async function() {
+                const marcaId = marcaSelect.value;
+                if (marcaId) {
+                    try {
+                        const modelos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos`);
+                        modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                        modelos.modelos.forEach(modelo => {
+                            const option = document.createElement("option");
+                            option.value = modelo.codigo;
+                            option.textContent = modelo.nome;
+                            modeloSelect.appendChild(option);
+                        });
+                        modeloSelect.disabled = false;
+                        anoSelect.disabled = true;
+                        resultadoDiv.innerHTML = ""; // Limpar resultado ao mudar seleção
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                    modeloSelect.disabled = true;
+                    anoSelect.disabled = true;
+                }
+            });
+
+            // Carregar anos
+            modeloSelect.addEventListener("change", async function() {
+                const marcaId = marcaSelect.value;
+                const modeloId = modeloSelect.value;
+                if (marcaId && modeloId) {
+                    try {
+                        const anos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos/${modeloId}/anos`);
+                        anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                        anos.forEach(ano => {
+                            const option = document.createElement("option");
+                            option.value = ano.codigo;
+                            option.textContent = ano.nome;
+                            anoSelect.appendChild(option);
+                        });
+                        anoSelect.disabled = false;
+                        resultadoDiv.innerHTML = ""; // Limpar resultado ao mudar seleção
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                    anoSelect.disabled = true;
+                }
+            });
+
+            // Mostrar resultado da consulta
+            consultarButton.addEventListener("click", async function() {
+                const marcaId = marcaSelect.value;
+                const modeloId = modeloSelect.value;
+                const anoId = anoSelect.value;
+                
+                if (marcaId && modeloId && anoId) {
+                    try {
+                        const preco = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos/${modeloId}/anos/${anoId}`);
+                        resultadoDiv.innerHTML = `
+                            <div class="resultado-item">
+                                <span class="marca">Marca: ${preco.Marca}</span>
+                            </div>
+                            <div class="resultado-item">
+                                <span class="modelo">Modelo: ${preco.Modelo}</span>
+                            </div>
+                            <div class="resultado-item">
+                                <span class="valor">Valor: ${preco.Valor}</span>
+                            </div>
+                            <div class="resultado-item">
+                                Ano Modelo: ${preco.AnoModelo}<br>
+                                Combustível: ${preco.Combustivel}<br>
+                                Código Fipe: ${preco.CodigoFipe}<br>
+                                Mês Referência: ${preco.MesReferencia}<br>
+                                Sigla Combustível: ${preco.SiglaCombustivel}
+                            </div>
+                        `;
+                    } catch (error) {
+                        resultadoDiv.textContent = "Erro ao obter os dados.";
+                        console.error(error);
+                    }
+                } else {
+                    alert("Por favor, selecione todos os campos.");
+                }
+            });
+
+            // Inicializar
+            loadMarcas();
+        });
+    </script>
+</body>
+</html>

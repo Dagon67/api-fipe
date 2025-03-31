@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado FIPE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Resultado da Consulta FIPE</h1>
+    <div id="resultado"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const resultadoDiv = document.getElementById("resultado");
+
+            // Função para fazer uma solicitação à API FIPE
+            async function fetchFromAPI(url) {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Erro na API");
+                return response.json();
+            }
+
+            // Função para obter os parâmetros da URL
+            function getQueryParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    marca: params.get("marca"),
+                    modelo: params.get("modelo"),
+                    ano: params.get("ano")
+                };
+            }
+
+            // Mostrar resultado da consulta
+            async function showResult() {
+                const { marca, modelo, ano } = getQueryParams();
+                if (marca && modelo && ano) {
+                    try {
+                        const preco = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marca}/modelos/${modelo}/anos/${ano}`);
+                        resultadoDiv.innerHTML = `
+                            <div class="resultado-item">
+                                <span class="marca">Marca: ${preco.Marca}</span>
+                            </div>
+                            <div class="resultado-item">
+                                <span class="modelo">Modelo: ${preco.Modelo}</span>
+                            </div>
+                            <div class="resultado-item">
+                                <span class="valor">Valor: ${preco.Valor}</span>
+                            </div>
+                            <div class="resultado-item">
+                                Ano Modelo: ${preco.AnoModelo}<br>
+                                Combustível: ${preco.Combustivel}<br>
+                                Código Fipe: ${preco.CodigoFipe}<br>
+                                Mês Referência: ${preco.MesReferencia}<br>
+                                Sigla Combustível: ${preco.SiglaCombustivel}
+                            </div>
+                        `;
+                    } catch (error) {
+                        resultadoDiv.textContent = "Erro ao obter os dados.";
+                        console.error(error);
+                    }
+                } else {
+                    resultadoDiv.textContent = "Parâmetros inválidos.";
+                }
+            }
+
+            // Inicializar
+            showResult();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta FIPE</title>
+    <style>
+        select, button {
+            margin: 10px 0;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consulta FIPE</h1>
+    
+    <label for="marca">Marca:</label>
+    <select id="marca">
+        <option value="">Selecione a marca</option>
+    </select>
+    
+    <label for="modelo">Modelo:</label>
+    <select id="modelo" disabled>
+        <option value="">Selecione o modelo</option>
+    </select>
+    
+    <label for="ano">Ano:</label>
+    <select id="ano" disabled>
+        <option value="">Selecione o ano</option>
+    </select>
+    
+    <button id="consultar">Consultar</button>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const marcaSelect = document.getElementById("marca");
+            const modeloSelect = document.getElementById("modelo");
+            const anoSelect = document.getElementById("ano");
+            const consultarButton = document.getElementById("consultar");
+
+            // Função para fazer uma solicitação à API FIPE
+            async function fetchFromAPI(url) {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Erro na API");
+                return response.json();
+            }
+
+            // Carregar marcas
+            async function loadMarcas() {
+                try {
+                    const marcas = await fetchFromAPI('https://parallelum.com.br/fipe/api/v1/carros/marcas');
+                    marcas.forEach(marca => {
+                        const option = document.createElement("option");
+                        option.value = marca.codigo;
+                        option.textContent = marca.nome;
+                        marcaSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Carregar modelos
+            marcaSelect.addEventListener("change", async function() {
+                const marcaId = marcaSelect.value;
+                if (marcaId) {
+                    try {
+                        const modelos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos`);
+                        modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                        modelos.modelos.forEach(modelo => {
+                            const option = document.createElement("option");
+                            option.value = modelo.codigo;
+                            option.textContent = modelo.nome;
+                            modeloSelect.appendChild(option);
+                        });
+                        modeloSelect.disabled = false;
+                        anoSelect.disabled = true;
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                    modeloSelect.disabled = true;
+                    anoSelect.disabled = true;
+                }
+            });
+
+            // Carregar anos
+            modeloSelect.addEventListener("change", async function() {
+                const marcaId = marcaSelect.value;
+                const modeloId = modeloSelect.value;
+                if (marcaId && modeloId) {
+                    try {
+                        const anos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos/${modeloId}/anos`);
+                        anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                        anos.forEach(ano => {
+                            const option = document.createElement("option");
+                            option.value = ano.codigo;
+                            option.textContent = ano.nome;
+                            anoSelect.appendChild(option);
+                        });
+                        anoSelect.disabled = false;
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                    anoSelect.disabled = true;
+                }
+            });
+
+            // Redirecionar para a página de resultados
+            consultarButton.addEventListener("click", function() {
+                const marcaId = marcaSelect.value;
+                const modeloId = modeloSelect.value;
+                const anoId = anoSelect.value;
+                
+                if (marcaId && modeloId && anoId) {
+                    window.location.href = `resultado.html?marca=${marcaId}&modelo=${modeloId}&ano=${anoId}`;
+                } else {
+                    alert("Por favor, selecione todos os campos.");
+                }
+            });
+
+            // Inicializar
+            loadMarcas();
+        });
+    </script>
+</body>
+</html>

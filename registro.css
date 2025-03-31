@@ -1,0 +1,84 @@
+.contaneier{
+    display:grid;
+    grid-template-rows: auto;
+    grid-template-columns: 1fr 1fr  ;
+    height: 500px;
+    grid-template-areas: 
+    "email email"
+    "senha senha"
+    "cadastro cadastro"
+
+    ;
+}
+
+
+
+
+h1{
+    /* margin-left: 870px; */
+    color: red;
+}
+
+.password{
+    margin-left: 900px;
+}   
+
+.input-box{
+    /* margin-left: 900px; */
+    margin-bottom: -150px;
+    margin-top: -15px;
+}
+
+
+
+h2{
+    /* margin-left: 900px; */
+    margin-left: -15px;
+}
+
+button{
+    /* margin-left: 900px */
+    margin-left: -30px;
+}
+
+
+
+.email{
+    grid-area: email;
+    background-color:white;
+    height: 20vh;
+    margin-left: 900px;
+}
+
+
+.senha{
+    grid-area: senha;
+    background-color:white ;
+    height: 20vh  ;
+}
+
+.cadastro{
+    grid-area: cadastro;
+    background-color:white;
+    height: 45vh;
+    margin-top: 200px;
+    margin-left: 900px;
+}
+
+.botao{
+justify-content: right;
+padding: 20px;
+/* margin-left:870px; */
+margin-top: 30px;
+padding: 60px;
+background-color: red;
+font-size: xx-large;
+}
+
+
+
+
+.ssenha{
+    margin-bottom: -400px;
+    margin
+}

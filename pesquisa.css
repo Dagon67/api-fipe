@@ -1,0 +1,121 @@
+.container {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    grid-template-areas: 
+        "modelo"
+        "marca"
+        "model"
+        "ano"
+        "kmh";
+    padding: 20px;
+}
+
+.modelo {
+    grid-area: modelo;
+    background-color: red;
+    padding: 0.3em;
+    text-align: center;
+    color: white;
+}
+
+.marca {
+    grid-area: marca;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.model {
+    grid-area: model;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ano {
+    grid-area: ano;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kmh {
+    grid-area: kmh;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.select-field {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    margin-top: 10px;
+}
+
+.btn-consultar {
+    width: 50%;
+    padding: 10px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.btn-consultar:hover {
+    background-color: #45a049;
+}
+
+.resultado {
+    margin-top: 20px;
+}
+
+.resultado-item {
+    margin-bottom: 15px;
+}
+
+.valor {
+    font-size: 1.5em;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.marca, .modelo {
+    font-size: 1.2em;
+    margin-top: 2em;
+}

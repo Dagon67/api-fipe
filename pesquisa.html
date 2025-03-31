@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="pesquisa.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta FIPE</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="modelo"><h1>Escolha seu modelo</h1></div>
+
+    <div class="form-group marca">
+        <label for="marca">Marca:</label>
+        <select id="marca" class="select-field">
+            <option value="">Selecione a marca</option>
+        </select>
+    </div>
+
+    <div class="form-group model">
+        <label for="modelo">Modelo:</label>
+        <select id="modelo" class="select-field" disabled>
+            <option value="">Selecione o modelo</option>
+        </select>
+    </div>
+
+    <div class="form-group ano">
+        <label for="ano">Ano:</label>
+        <select id="ano" class="select-field" disabled>
+            <option value="">Selecione o ano</option>
+        </select>
+    </div>
+
+    <div class="kmh">
+        <button id="consultar" class="btn-consultar">Consultar</button>
+        <div id="resultado" class="resultado"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const marcaSelect = document.getElementById("marca");
+        const modeloSelect = document.getElementById("modelo");
+        const anoSelect = document.getElementById("ano");
+        const consultarButton = document.getElementById("consultar");
+        const resultadoDiv = document.getElementById("resultado");
+
+        const PIXABAY_API_KEY = '45453981-90b9bd82a2c13a5538ce30402';
+
+        // Função para fazer uma solicitação à API FIPE
+        async function fetchFromAPI(url) {
+            try {
+                console.log(`Fetching data from URL: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorDetails = await response.text(); // Captura os detalhes do erro
+                    throw new Error(`Erro na API: ${response.status} - ${errorDetails}`);
+                }
+                return response.json();
+            } catch (error) {
+                console.error(error);
+                throw error;
+            }
+        }
+
+        // Carregar marcas
+        async function loadMarcas() {
+            try {
+                const marcas = await fetchFromAPI('https://parallelum.com.br/fipe/api/v1/carros/marcas');
+                marcas.forEach(marca => {
+                    const option = document.createElement("option");
+                    option.value = marca.codigo;
+                    option.textContent = marca.nome;
+                    marcaSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Erro ao carregar marcas:", error);
+            }
+        }
+
+        // Carregar modelos
+        marcaSelect.addEventListener("change", async function() {
+            const marcaId = marcaSelect.value;
+            if (marcaId) {
+                try {
+                    const modelos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos`);
+                    modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                    modelos.modelos.forEach(modelo => {
+                        const option = document.createElement("option");
+                        option.value = modelo.codigo;
+                        option.textContent = modelo.nome;
+                        modeloSelect.appendChild(option);
+                    });
+                    modeloSelect.disabled = false;
+                    anoSelect.disabled = true;
+                    resultadoDiv.innerHTML = ""; // Limpar resultado ao mudar seleção
+                } catch (error) {
+                    console.error("Erro ao carregar modelos:", error);
+                }
+            } else {
+                modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+                modeloSelect.disabled = true;
+                anoSelect.disabled = true;
+            }
+        });
+
+        // Carregar anos
+        modeloSelect.addEventListener("change", async function() {
+            const marcaId = marcaSelect.value;
+            const modeloId = modeloSelect.value;
+            if (marcaId && modeloId) {
+                try {
+                    const anos = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos/${modeloId}/anos`);
+                    anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                    anos.forEach(ano => {
+                        const option = document.createElement("option");
+                        option.value = ano.codigo;
+                        option.textContent = ano.nome;
+                        anoSelect.appendChild(option);
+                    });
+                    anoSelect.disabled = false;
+                    resultadoDiv.innerHTML = ""; // Limpar resultado ao mudar seleção
+                } catch (error) {
+                    console.error("Erro ao carregar anos:", error);
+                }
+            } else {
+                anoSelect.innerHTML = '<option value="">Selecione o ano</option>';
+                anoSelect.disabled = true;
+            }
+        });
+
+        // Função para buscar imagem no Pixabay
+        async function fetchCarImage(marca, modelo) {
+            const url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(marca + ' ' + modelo)}&image_type=photo&category=transport&per_page=3`;
+            try {
+                console.log(`Buscando imagem para: ${marca} ${modelo}`);
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log("Resultado da busca por imagem:", data);
+                return data.hits.length > 0 ? data.hits[0].webformatURL : null;
+            } catch (error) {
+                console.error("Erro ao buscar imagem no Pixabay:", error);
+                return null;
+            }
+        }
+
+        // Mostrar resultado da consulta
+        consultarButton.addEventListener("click", async function() {
+            const marcaId = marcaSelect.value;
+            const modeloId = modeloSelect.value;
+            const anoId = anoSelect.value;
+            
+            if (marcaId && modeloId && anoId) {
+                try {
+                    const preco = await fetchFromAPI(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaId}/modelos/${modeloId}/anos/${anoId}`);
+                    const marcaNome = marcaSelect.options[marcaSelect.selectedIndex].textContent;
+                    const modeloNome = modeloSelect.options[modeloSelect.selectedIndex].textContent;
+
+                    const imagemUrl = await fetchCarImage(marcaNome, modeloNome);
+
+                    resultadoDiv.innerHTML = `
+                        <div class="resultado-item">
+                            <span class="marca">Marca: ${preco.Marca}</span>
+                        </div>
+                        <div class="resultado-item">
+                            <span class="modelo">Modelo: ${preco.Modelo}</span>
+                        </div>
+                        <div class="resultado-item">
+                            <span class="valor">Valor: ${preco.Valor}</span>
+                        </div>
+                        <div class="resultado-item">
+                            Ano Modelo: ${preco.AnoModelo}<br>
+                            Combustível: ${preco.Combustivel}<br>
+                            Código Fipe: ${preco.CodigoFipe}<br>
+                            Mês Referência: ${preco.MesReferencia}<br>
+                            Sigla Combustível: ${preco.SiglaCombustivel}
+                        </div>
+                        ${imagemUrl ? `<div class="resultado-item"><img src="${imagemUrl}" alt="Imagem do ${preco.Modelo}" class="car-image"></div>` : '<p>Imagem não encontrada.</p>'}
+                    `;
+                } catch (error) {
+                    resultadoDiv.textContent = "Erro ao obter os dados.";
+                    console.error("Erro ao obter os dados:", error);
+                }
+            } else {
+                alert("Por favor, selecione todos os campos.");
+            }
+        });
+
+        // Inicializar
+        loadMarcas();
+    });
+</script>
+
+</body>
+</html>
