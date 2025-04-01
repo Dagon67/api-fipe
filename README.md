@@ -2,6 +2,10 @@
 
 Interface web para consulta de preços de veículos utilizando a API FIPE (Fundação Instituto de Pesquisas Econômicas).
 
+![Captura de tela 2025-04-01 103523](https://github.com/user-attachments/assets/bcf5aeb0-ba40-4cbf-b554-5f5a4e905ca6)
+![Captura de tela 2025-04-01 103545](https://github.com/user-attachments/assets/31f8efd8-a497-4eef-9e91-ff190d0e53bf)
+
+
 ## Funcionalidades
 
 - Consulta de preços de veículos
