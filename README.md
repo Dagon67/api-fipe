@@ -145,7 +145,6 @@ const config = {
 
 
 ## Contato
-
-Seu Nome - [@Dagon67](https://github.com/Dagon67)
+[@Dagon67](https://github.com/Dagon67)
 
 Link do Projeto: [https://github.com/Dagon67/api-fipe](https://github.com/Dagon67/api-fipe)
